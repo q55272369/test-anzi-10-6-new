@@ -1,22 +1,20 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Trigger Cloudflare Deploy</title>
-  </head>
-  <body>
-    <h3>Triggering deploy…</h3>
-    <pre id="out">running</pre>
-    <script>
-      const hook = "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/da328305-e098-4ff9-89b7-6e7f184a627e";
-      fetch(hook, { method: "POST" })
-        .then(async (r) => {
-          const t = await r.text();
-          document.getElementById("out").textContent = `status: ${r.status}\n${t}`;
-        })
-        .catch((e) => {
-          document.getElementById("out").textContent = String(e);
-        });
-    </script>
-  </body>
-</html>
+name: Axios
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+     - cron: '0 0 * * *' # 每24小时一次，测试用
+
+jobs:
+  axios-action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Auth API
+        uses: actionsflow/axios@v1
+        id: api
+        with:
+          url: https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/da328305-e098-4ff9-89b7-6e7f184a627e
+          method: "POST"
+      - run: echo ${{ steps.api.outputs.data }} # 打印数据
